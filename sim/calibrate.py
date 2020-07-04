@@ -49,7 +49,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     seed = args.seed or 0
     args.filename = args.filename or f'calibration_{seed}'
-    
+
     # check required settings
     if not (args.mob and args.area and args.country and args.start and args.end):
         print(
@@ -66,25 +66,25 @@ if __name__ == '__main__':
     '''
     Genereate essential functions for Bayesian optimization
     '''
-    
-    (objective, 
-     generate_initial_observations, 
-     initialize_model, 
-     optimize_acqf_and_get_observation, 
+
+    (objective,
+     generate_initial_observations,
+     initialize_model,
+     optimize_acqf_and_get_observation,
      case_diff,
      unnormalize_theta,
      header) = make_bayes_opt_functions(args=args)
 
     # logger
     logger = CalibrationLogger(
-        filename=args.filename, 
+        filename=args.filename,
         measures_optimized=args.measures_optimized,
         verbose=not args.not_verbose)
 
     # generate initial training data (either load or simulate)
     if args.load:
 
-        # load initial observations 
+        # load initial observations
         state = load_state(args.load)
         train_theta = state['train_theta']
         train_G = state['train_G']
@@ -95,7 +95,7 @@ if __name__ == '__main__':
         header.append('')
         header.append('Loaded initial observations from: ' + args.load)
         header.append(f'Observations: {train_theta.shape[0]}, Best objective: {best_observed_obj}')
-        
+
         # write header and best prior observations
         logger.log_initial_lines(header)
         for i in range(train_theta.shape[0]):
@@ -112,23 +112,23 @@ if __name__ == '__main__':
             )
 
     else:
-        
+
         # write header
         logger.log_initial_lines(header)
 
         # generate initial training data
         train_theta, train_G, train_G_sem, best_observed_obj, best_observed_idx = generate_initial_observations(
             n=args.ninit, logger=logger)
-
+        print("\nSHAPE OF TRAIN_THETA and is it the population?: ", train_theta.shape)
     # init model based on initial observations
-    mll, model = initialize_model(train_theta, train_G, train_G_sem)
+    # mll, model = initialize_model(train_theta, train_G, train_G_sem)
 
     best_observed = []
     best_observed.append(best_observed_obj)
 
     # run n_iterations rounds of Bayesian optimization after the initial random batch
     for tt in range(args.niters):
-        
+
         t0 = time.time()
 
         # fit the GP model
@@ -140,32 +140,32 @@ if __name__ == '__main__':
             objective=objective,
             num_fantasies=args.acqf_opt_num_fantasies,
         )
-        
+
         # optimize acquisition and get new observation via simulation at selected parameters
         new_theta, new_G, new_G_sem = optimize_acqf_and_get_observation(
             acq_func=acqf,
             args=args)
-            
+
         # concatenate observations
-        train_theta = torch.cat([train_theta, new_theta], dim=0) 
-        train_G = torch.cat([train_G, new_G], dim=0) 
-        train_G_sem = torch.cat([train_G_sem, new_G_sem], dim=0) 
-        
+        train_theta = torch.cat([train_theta, new_theta], dim=0)
+        train_G = torch.cat([train_G, new_G], dim=0)
+        train_G_sem = torch.cat([train_G_sem, new_G_sem], dim=0)
+
         # update progress
         train_G_objectives = objective(train_G)
         best_observed_idx = train_G_objectives.argmax()
         best_observed_obj = train_G_objectives[best_observed_idx].item()
         best_observed.append(best_observed_obj)
-        
+
         # re-initialize the models so they are ready for fitting on next iteration
         mll, model = initialize_model(
-            train_theta, 
-            train_G, 
+            train_theta,
+            train_G,
             train_G_sem,
         )
 
         t1 = time.time()
-        
+
         # log
         logger.log(
             i=tt,
@@ -191,10 +191,8 @@ if __name__ == '__main__':
     print('FINISHED.')
     print('Best objective:  ', best_observed_obj)
     print('Best parameters:')
-    
+
     # scale back to simulation parameters (from unit cube parameters in BO)
     normalized_calibrated_params = train_theta[best_observed_idx]
     calibrated_params = unnormalize_theta(normalized_calibrated_params)
     pprint.pprint(parr_to_pdict(calibrated_params, measures_optimized=args.measures_optimized))
-
-
