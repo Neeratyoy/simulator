@@ -135,9 +135,7 @@ if __name__ == '__main__':
     de.inc_score = best_observed_obj
     def f_objective(config): return objective(config), 0
     de.f_objective = f_objective
-    with open('de_dump.pkl', 'wb') as f:
-        pickle.dump(de, f)
-    print("\nDE SETUP done: {}, {}\n".format(de.population, de.fitness))
+    print("\nDE SETUP done: {}, {}, {}\n".format(de.population, de.fitness, de.f_objective))
 
     best_observed = []
     best_observed.append(best_observed_obj)
