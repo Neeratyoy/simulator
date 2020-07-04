@@ -78,7 +78,7 @@ def make_calibration_parser():
         help="crossover probability for DE")
     parser.add_argument("--strategy", type=str, default=settings_DE['strategy'],
         help="strategy for DE")
-    parser.add_argument("--type", type=str, default=settings_DE['type'],
+    parser.add_argument("--de_type", type=str, default=settings_DE['type'],
         help="type of DE update")
 
     return parser

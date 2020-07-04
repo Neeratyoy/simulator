@@ -39,6 +39,10 @@ from lib.plot import Plotter
 from lib.mobilitysim import MobilitySimulator
 from lib.calibrate_parser import make_calibration_parser
 
+sys.path.append('../../DEHB/')
+from dehb import DE, AsyncDE
+
+
 if __name__ == '__main__':
 
     '''
@@ -119,9 +123,18 @@ if __name__ == '__main__':
         # generate initial training data
         train_theta, train_G, train_G_sem, best_observed_obj, best_observed_idx = generate_initial_observations(
             n=args.ninit, logger=logger)
-        print("\nSHAPE OF TRAIN_THETA and is it the population?: ", train_theta.shape)
+        print("\nSHAPE OF TRAIN_THETA and is it the population?: {}\n".format(train_theta.shape))
     # init model based on initial observations
     # mll, model = initialize_model(train_theta, train_G, train_G_sem)
+    # DE-CHANGE: creating and initializing DE model
+    de = AsyncDE(dimensions=train_theta.shape[1], pop_size=args.pop_size,
+                 mutation_factor=args.mutation, crossover_prob=args.crossover,
+                 strategy=args.strategy, async_strategy=args.de_type)
+    de.population = train_theta.numpy()
+    de.fitness = train_G.numpy()
+    with open('de_dump.pkl', 'wb') as f:
+        pickle.dump(de, f)
+    print("\nDE SETUP done: {}, {}\n".format(de.population, de.fitness))
 
     best_observed = []
     best_observed.append(best_observed_obj)
