@@ -123,7 +123,7 @@ if __name__ == '__main__':
         # generate initial training data
         train_theta, train_G, train_G_sem, best_observed_obj, best_observed_idx = generate_initial_observations(
             n=args.ninit, logger=logger)
-        print("\nSHAPE OF TRAIN_THETA and is it the population?: {}\n".format(train_theta.shape))
+        logger.log("\nSHAPE OF TRAIN_THETA and is it the population?: {}\n".format(train_theta.shape))
     # init model based on initial observations
     # mll, model = initialize_model(train_theta, train_G, train_G_sem)
     # DE-CHANGE: creating and initializing DE model
@@ -132,9 +132,10 @@ if __name__ == '__main__':
                  strategy=args.strategy, async_strategy=args.de_type)
     de.population = train_theta.numpy()
     de.fitness = train_G.numpy()
+    de.inc_score = best_observed_obj
     with open('de_dump.pkl', 'wb') as f:
         pickle.dump(de, f)
-    print("\nDE SETUP done: {}, {}\n".format(de.population, de.fitness))
+    logger.log("\nDE SETUP done: {}, {}\n".format(de.population, de.fitness))
 
     best_observed = []
     best_observed.append(best_observed_obj)
