@@ -67,7 +67,7 @@ settings_DE = {
     'pop_size': 20,
     'mutation': 0.5,
     'crossover': 0.5,
-    'strategy': 'rand1/bin',
+    'strategy': 'rand1_bin',
     'type': 'immediate'
 }
 

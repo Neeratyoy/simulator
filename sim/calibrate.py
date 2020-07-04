@@ -133,8 +133,8 @@ if __name__ == '__main__':
     de.population = train_theta.numpy()
     de.fitness = train_G.numpy()
     de.inc_score = best_observed_obj
-    de.f = objective
-    # TODO: map objective function to DE's f
+    def f_objective(config): return objective(config), 0
+    de.f_objective = f_objective
     with open('de_dump.pkl', 'wb') as f:
         pickle.dump(de, f)
     print("\nDE SETUP done: {}, {}\n".format(de.population, de.fitness))
@@ -152,7 +152,16 @@ if __name__ == '__main__':
         t0 = time.time()
 
         # DE-CHANGE: no model-fitting, acquisition function
-        traj, runtime, history = de.evolve_generation()
+        if args.de_type == 'deferred':
+            # traj, runtime, history = de.evolve_generation()
+            for j in range(de.pop_size):
+                target = de.population[j]
+                donor = de.mutation(current=target)
+                trial = de.crossover(target, donor)
+                trial = de.boundary_check(trial)
+                trials.append(torch.tensor(trial, dtype=torch.float))
+            trials = np.array(trials)
+            traj, runtime, history = self.selection(trials, budget)
 
         # fit the GP model
         # fit_gpytorch_model(mll)
@@ -170,9 +179,9 @@ if __name__ == '__main__':
         #     args=args)
 
         # concatenate observations
-        train_theta = torch.cat([train_theta, new_theta], dim=0)
-        train_G = torch.cat([train_G, new_G], dim=0)
-        train_G_sem = torch.cat([train_G_sem, new_G_sem], dim=0)
+        # train_theta = torch.cat([train_theta, new_theta], dim=0)
+        # train_G = torch.cat([train_G, new_G], dim=0)
+        # train_G_sem = torch.cat([train_G_sem, new_G_sem], dim=0)
 
         # update progress
         train_G_objectives = objective(train_G)
@@ -181,11 +190,11 @@ if __name__ == '__main__':
         best_observed.append(best_observed_obj)
 
         # re-initialize the models so they are ready for fitting on next iteration
-        mll, model = initialize_model(
-            train_theta,
-            train_G,
-            train_G_sem,
-        )
+        # mll, model = initialize_model(
+        #     train_theta,
+        #     train_G,
+        #     train_G_sem,
+        # )
 
         t1 = time.time()
 
