@@ -123,7 +123,7 @@ if __name__ == '__main__':
         # generate initial training data
         train_theta, train_G, train_G_sem, best_observed_obj, best_observed_idx = generate_initial_observations(
             n=args.ninit, logger=logger)
-        print("\nSHAPE OF TRAIN_THETA and is it the population?: {}\n".format(train_theta.shape))
+        print("\nSHAPE OF TRAIN_THETA: {}\n".format(train_theta.shape))
     # init model based on initial observations
     # mll, model = initialize_model(train_theta, train_G, train_G_sem)
     # DE-CHANGE: creating and initializing DE model
@@ -133,8 +133,8 @@ if __name__ == '__main__':
     de.population = train_theta.numpy()
     de.fitness = train_G.numpy()
     de.inc_score = best_observed_obj
-    def f_objective(config): return objective(config), 0
-    de.f_objective = f_objective
+    # def f_objective(config): return objective(config), 0
+    de.f_objective = objective
     print("\nDE SETUP done: {}, {}, {}\n".format(de.population, de.fitness, de.f_objective))
 
     best_observed = []
@@ -145,21 +145,23 @@ if __name__ == '__main__':
     # DE-CHANGE: one generation of DE constitutes pop_size number of function evaluations
     n_iters = args.niters % args.ninit
     remaining_iters = args.niters - n_iters * args.ninit
-    for tt in range(n_iters):
+    for tt in range(args.niters):
 
         t0 = time.time()
 
+        parent_idx = tt % de.pop_size
+
         # DE-CHANGE: no model-fitting, acquisition function
-        if args.de_type == 'deferred':
-            # traj, runtime, history = de.evolve_generation()
-            for j in range(de.pop_size):
-                target = de.population[j]
-                donor = de.mutation(current=target)
-                trial = de.crossover(target, donor)
-                trial = de.boundary_check(trial)
-                trials.append(torch.tensor(trial, dtype=torch.float))
-            trials = np.array(trials)
-            traj, runtime, history = self.selection(trials, budget)
+        target = de.population[parent_idx]
+        donor = de.mutation(current=target)
+        trial = de.crossover(target, donor)
+        G = objective(trial)
+        # selection
+        if G < de.fitness[parent_idx]:
+            de.population[parent_idx] = trial
+            de.fitness[parent_idx] = G
+            if G <= best_observed_obj:
+                best_observed_obj = G
 
         # fit the GP model
         # fit_gpytorch_model(mll)
