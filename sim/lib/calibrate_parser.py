@@ -22,22 +22,22 @@ def make_calibration_parser():
         help="update default number of parallel simulation rollouts")
     parser.add_argument("--cpu_count", type=int, default=settings_simulation['cpu_count'],
         help="update default number of cpus used for parallel simulation rollouts")
-    parser.add_argument("--load", 
+    parser.add_argument("--load",
         help="specify path to a BO state to be loaded as initial observations, e.g. 'logs/calibration_0_state.pk'")
 
     # SD tuning
     parser.add_argument("--measures_optimized", action="store_true",
         help="when passed, BO optimizes `p_stay_home` for SocialDistancingForAllMeasure at given starting date")
-    parser.add_argument("--measures_close", nargs="+", 
+    parser.add_argument("--measures_close", nargs="+",
         help="when `--measures_optimized` is active, closes all site types passed after this argument")
- 
+
 
     # data
-    parser.add_argument("--mob", 
+    parser.add_argument("--mob",
         help="specify path to mobility settings for trace generation, e.g. 'lib/tu_settings_10.pk'")
-    parser.add_argument("--country", 
+    parser.add_argument("--country",
         help="specify country indicator for data import")
-    parser.add_argument("--area", 
+    parser.add_argument("--area",
         help="specify area indicator for data import")
     parser.add_argument("--start",
         help="set starting date for which case data is retrieved "
@@ -68,5 +68,17 @@ def make_calibration_parser():
         help="update default for acquisition function optim.: batch limit")
     parser.add_argument("--acqf_opt_maxiter", type=int, default=settings_acqf['acqf_opt_maxiter'],
         help="update default for acquisition function optim.: maximum iteraitions")
+
+    # DE
+    parser.add_argument("--pop_size", type=int, default=settings_DE['pop_size'],
+        help="population size for DE")
+    parser.add_argument("--mutation", type=float, default=settings_DE['mutation'],
+        help="mutation factor for DE")
+    parser.add_argument("--crossover", type=float, default=settings_DE['crossover'],
+        help="crossover probability for DE")
+    parser.add_argument("--strategy", type=str, default=settings_DE['strategy'],
+        help="strategy for DE")
+    parser.add_argument("--type", type=str, default=settings_DE['type'],
+        help="type of DE update")
 
     return parser

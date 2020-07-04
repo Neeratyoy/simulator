@@ -44,7 +44,7 @@ settings_testing_params = {
     'test_fpr': 0.0,
     'test_fnr': 0.0,
     'test_smart_delta': 3 * TO_HOURS,
-    'test_smart_duration': 7 * TO_HOURS, 
+    'test_smart_duration': 7 * TO_HOURS,
     'test_smart_action': 'isolate',
     'test_smart_num_contacts': 10,
     'test_targets': 'isym',
@@ -62,6 +62,14 @@ settings_acqf = {
     'acqf_opt_maxiter': 20,
 }
 
+# default settings for DE
+settings_DE = {
+    'pop_size': 20,
+    'mutation': 0.5,
+    'crossover': 0.5,
+    'strategy': 'rand1/bin',
+    'type': 'immediate'
+}
 
 # area codes
 command_line_area_codes = {
@@ -79,7 +87,7 @@ command_line_area_codes = {
         'VD': 'VD',     # Canton Vaud
         'JU': 'JU',     # Canton Jura
     }
-}				
+}
 
 # optimized model parameters
 beta_dummy = 0.5
@@ -182,4 +190,3 @@ settings_lockdown_dates = {
         'end': '05-10-2020',
     },
 }
-
