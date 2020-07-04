@@ -123,7 +123,7 @@ if __name__ == '__main__':
         # generate initial training data
         train_theta, train_G, train_G_sem, best_observed_obj, best_observed_idx = generate_initial_observations(
             n=args.ninit, logger=logger)
-        logger.log("\nSHAPE OF TRAIN_THETA and is it the population?: {}\n".format(train_theta.shape))
+        print("\nSHAPE OF TRAIN_THETA and is it the population?: {}\n".format(train_theta.shape))
     # init model based on initial observations
     # mll, model = initialize_model(train_theta, train_G, train_G_sem)
     # DE-CHANGE: creating and initializing DE model
@@ -133,32 +133,41 @@ if __name__ == '__main__':
     de.population = train_theta.numpy()
     de.fitness = train_G.numpy()
     de.inc_score = best_observed_obj
+    de.f = objective
+    # TODO: map objective function to DE's f
     with open('de_dump.pkl', 'wb') as f:
         pickle.dump(de, f)
-    logger.log("\nDE SETUP done: {}, {}\n".format(de.population, de.fitness))
+    print("\nDE SETUP done: {}, {}\n".format(de.population, de.fitness))
 
     best_observed = []
     best_observed.append(best_observed_obj)
 
     # run n_iterations rounds of Bayesian optimization after the initial random batch
-    for tt in range(args.niters):
+    # for tt in range(args.niters):
+    # DE-CHANGE: one generation of DE constitutes pop_size number of function evaluations
+    n_iters = args.niters % args.ninit
+    remaining_iters = args.niters - n_iters * args.ninit
+    for tt in range(n_iters):
 
         t0 = time.time()
 
+        # DE-CHANGE: no model-fitting, acquisition function
+        traj, runtime, history = de.evolve_generation()
+
         # fit the GP model
-        fit_gpytorch_model(mll)
+        # fit_gpytorch_model(mll)
 
         # define acquisition function based on fitted GP
-        acqf = qKnowledgeGradient(
-            model=model,
-            objective=objective,
-            num_fantasies=args.acqf_opt_num_fantasies,
-        )
+        # acqf = qKnowledgeGradient(
+        #     model=model,
+        #     objective=objective,
+        #     num_fantasies=args.acqf_opt_num_fantasies,
+        # )
 
         # optimize acquisition and get new observation via simulation at selected parameters
-        new_theta, new_G, new_G_sem = optimize_acqf_and_get_observation(
-            acq_func=acqf,
-            args=args)
+        # new_theta, new_G, new_G_sem = optimize_acqf_and_get_observation(
+        #     acq_func=acqf,
+        #     args=args)
 
         # concatenate observations
         train_theta = torch.cat([train_theta, new_theta], dim=0)
