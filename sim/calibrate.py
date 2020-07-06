@@ -128,6 +128,7 @@ if __name__ == '__main__':
     # init model based on initial observations
     # mll, model = initialize_model(train_theta, train_G, train_G_sem)
     # DE-CHANGE: creating and initializing DE model
+    args.pop_size = args.ninit
     de = AsyncDE(dimensions=train_theta.shape[1], pop_size=args.pop_size,
                  mutation_factor=args.mutation, crossover_prob=args.crossover,
                  strategy=args.strategy, async_strategy=args.de_type)
