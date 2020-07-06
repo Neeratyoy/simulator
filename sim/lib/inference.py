@@ -531,11 +531,11 @@ def make_bayes_opt_functions(args):
         and returns simulator output means and standard errors based on multiple
         random restarts. This corresponds to the black-box function.
         """
-        print("Sim bounds: {}".format(sim_bounds))
-        print("Pre-transform: {}".format(norm_params))
+        # print("Sim bounds: {}".format(sim_bounds))
+        # print("Pre-transform: {}".format(norm_params))
         # un-normalize normalized params to obtain simulation parameters
         params = transforms.unnormalize(norm_params, sim_bounds)
-        print("Post-transform: {}".format(params))
+        # print("Post-transform: {}".format(params))
 
         # finalize settings based which parameters are calibrated
         kwargs = copy.deepcopy(launch_kwargs)
@@ -600,7 +600,7 @@ def make_bayes_opt_functions(args):
 
             kwargs['params'] = parr_to_pdict(params, measures_optimized=args.measures_optimized)
 
-        print("parr-to-dict: {}".format(parr_to_pdict(params, measures_optimized=args.measures_optimized)))
+        # print("parr-to-dict: {}".format(parr_to_pdict(params, measures_optimized=args.measures_optimized)))
 
         # run simulation in parallel,
         summary = launch_parallel_simulations(**kwargs)
@@ -628,7 +628,7 @@ def make_bayes_opt_functions(args):
         G = G.reshape(1, n_days * n_age)
         G_sem = G_sem.reshape(1, n_days * n_age)
 
-        print("End of composite: \nG = {}\nG_sem = {}")
+        # print("End of composite: \nG = {}\nG_sem = {}")
 
         return G, G_sem
 
@@ -647,7 +647,7 @@ def make_bayes_opt_functions(args):
         # new_thetas: [n, n_params]
         new_thetas = torch.tensor(
             sobol_seq.i4_sobol_generate(n_params, n), dtype=torch.float)
-        print("Inside 'generate_initial_observations': \nnew_thetas = {}\nshape = {}".format(new_thetas, new_thetas.shape))
+        # print("Inside 'generate_initial_observations': \nnew_thetas = {}\nshape = {}".format(new_thetas, new_thetas.shape))
         # simulator observations
         # new_G, new_G_sem: [n, n_days * n_age] (flattened outputs)
         new_G = torch.zeros((n, n_days * n_age), dtype=torch.float)
@@ -663,16 +663,16 @@ def make_bayes_opt_functions(args):
             new_G_sem[i, :] = G_sem
 
             # log
-            print("pre-objective: {}".format(new_G[:i+1].shape))
+            # print("pre-objective: {}".format(new_G[:i+1].shape))
             G_objectives = objective(new_G[:i+1])
-            print("post-objective: {}".format(G_objectives.shape))
+            # print("post-objective: {}".format(G_objectives.shape))
             # best_idx = G_objectives.argmax()
             best_idx = G_objectives.argmin()
-            print("best_idx: {}".format(best_idx.shape))
+            # print("best_idx: {}".format(best_idx.shape))
             best = G_objectives[best_idx].item()
-            print("best: {}".format(best))
+            # print("best: {}".format(best))
             current = objective(G).item()
-            print("current: {}".format(current))
+            # print("current: {}".format(current))
             case_diff = (
                 G.reshape(n_days, n_age)[-1].sum()
                 - G_obs.reshape(n_days, n_age)[-1].sum())
@@ -696,20 +696,20 @@ def make_bayes_opt_functions(args):
                 'best_observed_idx': best_idx,
             }
             save_state(state, logger.filename + '_init')
-            temp_state = {
-                'train_theta': new_thetas[:i+1].shape,
-                'train_G': new_G[:i+1].shape,
-                'train_G_sem': new_G_sem[:i+1].shape,
-                'best_observed_obj': best,
-                'best_observed_idx': best_idx,
-            }
+            # temp_state = {
+            #     'train_theta': new_thetas[:i+1].shape,
+            #     'train_G': new_G[:i+1].shape,
+            #     'train_G_sem': new_G_sem[:i+1].shape,
+            #     'best_observed_obj': best,
+            #     'best_observed_idx': best_idx,
+            # }
         # compute best objective from simulations
         f = objective(new_G)
         # best_f_idx = f.argmax()
         best_f_idx = f.argmin()
         best_f = f[best_f_idx].item()
 
-        print("End of initial:\nthetas = {}\nG = {}\nG_sem = {}\nbest = {}".format(new_thetas.shape, new_G.shape, new_G_sem.shape, best_f))
+        # print("End of initial:\nthetas = {}\nG = {}\nG_sem = {}\nbest = {}".format(new_thetas.shape, new_G.shape, new_G_sem.shape, best_f))
 
         return new_thetas, new_G, new_G_sem, best_f, best_f_idx
 

@@ -123,7 +123,7 @@ if __name__ == '__main__':
         # generate initial training data
         train_theta, train_G, train_G_sem, best_observed_obj, best_observed_idx = generate_initial_observations(
             n=args.ninit, logger=logger)
-        print("\nSHAPE OF TRAIN_THETA: {}\n".format(train_theta.shape))
+        # print("\nSHAPE OF TRAIN_THETA: {}\n".format(train_theta.shape))
     # init model based on initial observations
     # mll, model = initialize_model(train_theta, train_G, train_G_sem)
     # DE-CHANGE: creating and initializing DE model
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     de.population = train_theta.numpy()
     de.fitness = train_G.numpy()
     de.inc_score = best_observed_obj
-    print("\nDE SETUP done: {}, {}, {}\n".format(de.population, de.fitness, de.f_objective))
+    # print("\nDE SETUP done: {}, {}, {}\n".format(de.population, de.fitness, de.f_objective))
 
     best_observed = []
     best_observed.append(best_observed_obj)
@@ -220,10 +220,10 @@ if __name__ == '__main__':
         save_state(state, args.filename)
 
     # print best parameters
-    print()
+    # print()
     print('FINISHED.')
-    print('Best objective:  ', best_observed_obj)
-    print('Best parameters:')
+    # print('Best objective:  ', best_observed_obj)
+    # print('Best parameters:')
 
     # scale back to simulation parameters (from unit cube parameters in BO)
     normalized_calibrated_params = train_theta[best_observed_idx]
