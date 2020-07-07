@@ -20,7 +20,7 @@ import torch
 from botorch import fit_gpytorch_model
 from botorch.exceptions import BadInitialCandidatesWarning
 import botorch.utils.transforms as transforms
-from lib.inference import make_bayes_opt_functions, pdict_to_parr, parr_to_pdict, CalibrationLogger, save_state, load_state, gen_initial_seeds
+from lib.inference import make_de_opt_functions, pdict_to_parr, parr_to_pdict, CalibrationLogger, save_state, load_state, gen_initial_seeds
 from lib.inference_kg import qKnowledgeGradient
 import time, pprint
 
