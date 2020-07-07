@@ -77,7 +77,7 @@ if __name__ == '__main__':
      eval_objective,
      case_diff,
      unnormalize_theta,
-     header) = make_bayes_opt_functions(args=args)
+     header) = make_de_opt_functions(args=args)
 
     # logger
     logger = CalibrationLogger(
