@@ -150,10 +150,11 @@ if __name__ == '__main__':
 
         parent_idx = tt % de.pop_size
 
-        # DE-CHANGE: no model-fitting, acquisition function
+        # DE-CHANGE: no model-fitting, equivalent to acquisition function
         target = de.population[parent_idx]
         donor = de.mutation(current=target)
         trial = de.crossover(target, donor)
+        trial = de.boundary_check(trial)
         new_theta = torch.tensor(trial, dtype=torch.float)
         new_G, new_G_sem = eval_objective(new_theta.squeeze())
         G = objective(new_G).item()
