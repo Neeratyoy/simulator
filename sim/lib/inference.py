@@ -1141,7 +1141,7 @@ def make_de_opt_functions(args):
     return (
         objective,
         generate_initial_observations,
-        _,
+        None,
         eval_objective,
         case_diff,
         unnormalize_theta,
