@@ -229,8 +229,8 @@ if __name__ == '__main__':
     # print('Best parameters:')
 
     # scale back to simulation parameters (from unit cube parameters in BO)
-    normalized_calibrated_params = de.inc_config #train_theta[best_observed_idx]
-    calibrated_params = unnormalize_theta(normalized_calibrated_params)
+    normalized_calibrated_params = torch.tensor(de.inc_config, dtype=torch.float) #de.inc_config #train_theta[best_observed_idx]
+    calibrated_params = unnormalize_theta(normalized_calibrated_params.squeeze())
     pprint.pprint(parr_to_pdict(calibrated_params, measures_optimized=args.measures_optimized))
 
     with open('logs/{}_betas.pkl'.format(args.filename), 'wb') as f:
