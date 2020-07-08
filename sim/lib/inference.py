@@ -1118,7 +1118,7 @@ def make_de_opt_functions(args):
                 'train_G': new_G[:i+1],
                 'train_G_sem': new_G_sem[:i+1],
                 'best_observed_obj': best,
-                'best_observed_idx': best_idx,
+                'best_observed_idx': new_thetas[best_idx],
             }
             save_state(state, logger.filename + '_init')
         # compute best objective from simulations
@@ -1127,7 +1127,7 @@ def make_de_opt_functions(args):
         best_f_idx = f.argmin()
         best_f = f[best_f_idx].item()
 
-        return new_thetas, new_G, new_G_sem, best_f, best_f_idx
+        return new_thetas, new_G, new_G_sem, best_f, new_thetas[best_f_idx]
 
     # Model initialization
     # parameters used in BO are always in unit cube for optimal hyperparameter tuning of GPs

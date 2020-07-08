@@ -134,6 +134,7 @@ if __name__ == '__main__':
     de.population = train_theta.numpy()
     de.fitness = train_G.numpy()
     de.inc_score = best_observed_obj
+    de.inc_config = best_observed_obj
     # print("\nDE SETUP done: {}, {}, {}\n".format(de.population, de.fitness, de.f_objective))
 
     best_observed = []
@@ -164,6 +165,7 @@ if __name__ == '__main__':
             de.fitness[parent_idx] = new_G
             if G <= best_observed_obj:
                 best_observed_obj = G
+                de.inc_config = trial
 
         # fit the GP model
         # fit_gpytorch_model(mll)
@@ -216,7 +218,7 @@ if __name__ == '__main__':
             'train_G' : train_G,
             'train_G_sem'  : train_G_sem,
             'best_observed_obj': best_observed_obj,
-            'best_observed_idx': best_observed_idx
+            'best_observed_idx': de.inc_config
         }
         save_state(state, args.filename)
 
@@ -227,7 +229,7 @@ if __name__ == '__main__':
     # print('Best parameters:')
 
     # scale back to simulation parameters (from unit cube parameters in BO)
-    normalized_calibrated_params = train_theta[best_observed_idx]
+    normalized_calibrated_params = de.inc_config #train_theta[best_observed_idx]
     calibrated_params = unnormalize_theta(normalized_calibrated_params)
     pprint.pprint(parr_to_pdict(calibrated_params, measures_optimized=args.measures_optimized))
 
