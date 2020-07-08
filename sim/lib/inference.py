@@ -1078,6 +1078,8 @@ def make_de_opt_functions(args):
         new_G = torch.zeros((n, n_days * n_age), dtype=torch.float)
         new_G_sem = torch.zeros((n, n_days * n_age), dtype=torch.float)
 
+        incumbent = np.inf
+
         for i in range(n):
 
             t0 = time.time()
@@ -1097,6 +1099,9 @@ def make_de_opt_functions(args):
             best = G_objectives[best_idx].item()
             # print("best: {}".format(best))
             current = objective(G).item()
+            if current <= incumbent:
+                best_observed = new_thetas[i, :]
+                incumbent = current
             # print("current: {}".format(current))
             case_diff = (
                 G.reshape(n_days, n_age)[-1].sum()
@@ -1118,7 +1123,7 @@ def make_de_opt_functions(args):
                 'train_G': new_G[:i+1],
                 'train_G_sem': new_G_sem[:i+1],
                 'best_observed_obj': best,
-                'best_observed_idx': new_thetas[best_idx],
+                'best_observed': best_observed,
             }
             save_state(state, logger.filename + '_init')
         # compute best objective from simulations

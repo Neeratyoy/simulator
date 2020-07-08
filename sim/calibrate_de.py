@@ -121,7 +121,7 @@ if __name__ == '__main__':
         logger.log_initial_lines(header)
 
         # generate initial training data
-        train_theta, train_G, train_G_sem, best_observed_obj, best_observed_idx = generate_initial_observations(
+        train_theta, train_G, train_G_sem, best_observed_obj, incumbent = generate_initial_observations(
             n=args.ninit, logger=logger)
         # print("\nSHAPE OF TRAIN_THETA: {}\n".format(train_theta.shape))
     # init model based on initial observations
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     de.population = train_theta.numpy()
     de.fitness = train_G.numpy()
     de.inc_score = best_observed_obj
-    de.inc_config = best_observed_obj
+    de.inc_config = incumbent
     # print("\nDE SETUP done: {}, {}, {}\n".format(de.population, de.fitness, de.f_objective))
 
     best_observed = []
@@ -218,7 +218,7 @@ if __name__ == '__main__':
             'train_G' : train_G,
             'train_G_sem'  : train_G_sem,
             'best_observed_obj': best_observed_obj,
-            'best_observed_idx': de.inc_config
+            'best_observed': de.inc_config
         }
         save_state(state, args.filename)
 

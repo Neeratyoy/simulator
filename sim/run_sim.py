@@ -79,6 +79,7 @@ else:
     seed_day_ = 7
     initial_seeeds = extract_seeds_from_summary(seed_summary_, seed_day_, new_cases)
 
+import sys
 with open('logs/{}_betas.pkl'.format(sys.argv[1]), 'rb') as f:
     inferred_params = pickle.load(f)
 
