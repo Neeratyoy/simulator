@@ -80,7 +80,8 @@ else:
     initial_seeeds = extract_seeds_from_summary(seed_summary_, seed_day_, new_cases)
 
 import sys
-with open('logs/{}_betas.pkl'.format(sys.argv[1]), 'rb') as f:
+optim = sys.argv[1]
+with open('logs/{}_betas.pkl'.format(optim), 'rb') as f:
     inferred_params = pickle.load(f)
 
 print("Loading betas: \n")
@@ -175,7 +176,7 @@ plotter = Plotter()
 plotter.plot_positives_vs_target(
     summary_example, new_cases.sum(axis=1),
     title='Example',
-    filename=runstr + 'ex_00',
+    filename=optim + '_' + runstr + 'ex_00',
     figsize=(6, 4),
     start_date=start_date,
     errorevery=1, acc=1000,
@@ -185,7 +186,7 @@ plotter.plot_positives_vs_target(
 plotter = Plotter()
 plotter.plot_daily_rts(
     summary_example,
-    filename=runstr + 'ex_01',
+    filename=optim + '_' + runstr + 'ex_01',
     start_date=start_date,
     sigma=None,
     figsize=(6, 4),
@@ -203,7 +204,7 @@ plotter = Plotter()
 plotter.plot_daily_infected(
     summary_example,
     title='',
-    filename=runstr + 'ex_02',
+    filename=optim + '_' + runstr + 'ex_02',
     errorevery=100, acc=1000,
     figsize=(6, 4),
     start_date=start_date,
@@ -217,7 +218,7 @@ plotter = Plotter()
 plotter.plot_cumulative_infected(
     summary_example,
     title='',
-    filename=runstr + 'ex_03',
+    filename=optim + '_' + runstr + 'ex_03',
     figsize=(6, 4),
     legend_loc='upper left',
     errorevery=100, acc=1000,
